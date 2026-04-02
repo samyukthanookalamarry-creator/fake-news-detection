@@ -21,3 +21,5 @@ The model achieved high accuracy during testing. The results are influenced by t
 
 ## How to Run
 1. Install dependencies:
+
+## Note: The dataset is not included due to size limitations but was used during model training.
