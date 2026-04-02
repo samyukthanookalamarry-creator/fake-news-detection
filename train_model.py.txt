@@ -1,0 +1,50 @@
+# ================================
+# Fake News Detection - Training
+# ================================
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report
+import pickle
+
+# Load dataset
+data = pd.read_excel("Fake and Real News Dataset.xlsx")
+
+# Select features and labels
+X = data['Full_Text'].fillna('')
+y = data['News_Type']
+
+# Convert labels
+y = y.astype(str).str.lower()
+y = y.map({'fake': 0, 'real': 1})
+
+# Split dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# Convert text to numerical features
+vectorizer = TfidfVectorizer(stop_words='english')
+X_train_vec = vectorizer.fit_transform(X_train)
+X_test_vec = vectorizer.transform(X_test)
+
+# Train model
+model = LogisticRegression(max_iter=1000)
+model.fit(X_train_vec, y_train)
+
+# Evaluate model
+y_pred = model.predict(X_test_vec)
+
+accuracy = accuracy_score(y_test, y_pred)
+print("Model Accuracy:", accuracy)
+
+print("\nClassification Report:\n")
+print(classification_report(y_test, y_pred))
+
+# Save model and vectorizer
+pickle.dump(model, open("model.pkl", "wb"))
+pickle.dump(vectorizer, open("vectorizer.pkl", "wb"))
+
+print("\nModel saved successfully.")
